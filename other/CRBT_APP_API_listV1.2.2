@@ -1,0 +1,107 @@
+TEST MSISDN: 252614097961,252614097962, 252614097965, 252614097964, 252614097967
+
+1) to generate the session token for the MSISDn
+
+curl -X POST 'http://149.28.148.198:8082/security/authenticate' -H 'Content-Type: application/json' -d '{    "username" : "252613346921",    "password" : "2023"}'
+
+{"userDTO":{"id":"","username":null,"password":null,"email":null,"firstname":null,"lastname":null,"phonenumber":null,"status":null,"rolename":null},"error":"","token":"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNTI2MTMzNDY5MjEiLCJleHAiOjE2ODg1MDE3NjcsImlhdCI6MTY4ODQ4Mzc2N30.o7716ONvksvAYMfk-ZWCSzpDJnxoo3oYcwegelae4izWQAwYcsaMITbS_E70m9SacuP34L4dume3BtWy9Bcisw"}
+
+2) check the profiling
+
+curl -X POST 'http://149.28.148.198:8082/api/profiling' -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNTI2MTMzNDY5MjEiLCJleHAiOjE2ODg1MDE3NjcsImlhdCI6MTY4ODQ4Mzc2N30.o7716ONvksvAYMfk-ZWCSzpDJnxoo3oYcwegelae4izWQAwYcsaMITbS_E70m9SacuP34L4dume3BtWy9Bcisw'  -H 'Content-Type: application/json' -d '{ "msisdn": "252613346921", "offer": "CRBT" }'
+
+{"userinfo":null,"tonesdata":null,"errorCode":"1","result":"FAIL","errorMsg":"NO SUBSCRIPTION FORProfileQuery","albumid":null}
+
+
+3) get the AOC details 
+
+ curl -X POST 'http://149.28.148.198:8082/api/aoc' -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNTI2MTMzNDY5MjEiLCJleHAiOjE2ODg1MDE3NjcsImlhdCI6MTY4ODQ4Mzc2N30.o7716ONvksvAYMfk-ZWCSzpDJnxoo3oYcwegelae4izWQAwYcsaMITbS_E70m9SacuP34L4dume3BtWy9Bcisw' -H  'Content-Type: application/json' -d '{ "langid": "en", "servicetype": "crbt" }'
+
+{"message":"crbt tone will be cost you 0.02 USD.","price":"0.02 USD."}
+
+
+servicetype : crbt, shuffle , nametone, special, prayer, gift
+
+
+4) subscribe CRBT API
+
+curl -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNTI2MTMzNDY5MjEiLCJleHAiOjE2ODg1MDE3NjcsImlhdCI6MTY4ODQ4Mzc2N30.o7716ONvksvAYMfk-ZWCSzpDJnxoo3oYcwegelae4izWQAwYcsaMITbS_E70m9SacuP34L4dume3BtWy9Bcisw'  -H 'Content-Type: application/json' -d '{"msisdn": "252613346921",  "langid" : "en", "offer":"CRBT" }' http://149.28.148.198:8082/api/subscribe
+ 
+{"msisdn":"+252613346921","errorCode":"0","result":"SUCCESS","errorMsg":"","cpid":null,"tid":null,"path":null}
+
+
+
+5) Get song list API
+
+curl -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNTI2MTMzNDY5MjEiLCJleHAiOjE2ODg1MDE3NjcsImlhdCI6MTY4ODQ4Mzc2N30.o7716ONvksvAYMfk-ZWCSzpDJnxoo3oYcwegelae4izWQAwYcsaMITbS_E70m9SacuP34L4dume3BtWy9Bcisw' -H  'Content-Type: application/json' -d '{"category": "NormalRPT", "subcategory":"D_Nashed" , "msisdn": "252613346921" }' http://149.28.148.198:8082/api/gettonelist
+
+
+{"tonesdata":[{"tonetype":"NormalRPT","toneid":"'01021062100081","tonename":"'N_nashid"},{"tonetype":"NormalRPT","toneid":"'01021062100082","tonename":"'N_nashid"}],"errorCode":"0","result":"SUCCESS","errorMsg":"","albumid":""}
+
+a) default category :means toneType="default" in add/delete tone API
+"category": "NormalRPT", "subcategory":"D_Nashed"
+"category": "NormalRPT", "subcategory":"D_gabay"
+"category": "NormalRPT", "subcategory":"D_Duco"
+
+b) special category :means toneType="special" in add/delete tone API with particular msisdn
+"category": "NormalRPT", "subcategory":"D_Nashed"
+"category": "NormalRPT", "subcategory":"D_gabay"
+"category": "NormalRPT", "subcategory":"D_Duco"
+
+c) Shuffle category :means toneType="shuffle" in add/delete tone API with particular msisdn
+"category": "shuffle", "subcategory":"shuffle"
+
+d) nametone category :means toneType="nametone" in add/delete tone API with particular msisdn
+"category": "nametone", "subcategory":"nametone"
+
+e) nametone category :means toneType="prayer" in add/delete tone API with particular msisdn
+"category": "prayer", "subcategory":"prayer"
+
+
+
+6) Tone add API
+
+ curl -X POST 'http://149.28.148.198:8082/api/tone/add' -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNTI2MTMzNDY5MjEiLCJleHAiOjE2ODg1MDE3NjcsImlhdCI6MTY4ODQ4Mzc2N30.o7716ONvksvAYMfk-ZWCSzpDJnxoo3oYcwegelae4izWQAwYcsaMITbS_E70m9SacuP34L4dume3BtWy9Bcisw' -H  'Content-Type: application/json' -d '{"msisdn": "+252613346921",  "langid" : "en", "toneType":"prayer" , "toneid":"04010101010010","tonename":"SONG TITTLE FOR prayer1" ,"calledparty":""}'
+
+{"msisdn":"+252613346921","errorCode":"0","result":"SUCCESS","errorMsg":"","cpid":null,"tid":null,"path":null}
+
+toneType : shuffle , nametone, special, prayer,
+
+7) Tone delete API
+
+ curl -X POST 'http://149.28.148.198:8082/api/tone/delete' -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNTI2MTMzNDY5MjEiLCJleHAiOjE2ODg1MDE3NjcsImlhdCI6MTY4ODQ4Mzc2N30.o7716ONvksvAYMfk-ZWCSzpDJnxoo3oYcwegelae4izWQAwYcsaMITbS_E70m9SacuP34L4dume3BtWy9Bcisw' -H  'Content-Type: application/json' -d '{"msisdn": "+252613346921",  "langid" : "en", "toneType":"prayer" , "toneid":"04010101010010","tonename":"SONG TITTLE FOR prayer1" ,"calledparty":""}'
+
+categories of tone means toneType : shuffle , nametone, special, prayer,
+
+8) curl -X POST 'http://149.28.148.198:8082/api/gift' -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNTI2MTMzNDY5MjEiLCJleHAiOjE2ODg1MDE3NjcsImlhdCI6MTY4ODQ4Mzc2N30.o7716ONvksvAYMfk-ZWCSzpDJnxoo3oYcwegelae4izWQAwYcsaMITbS_E70m9SacuP34L4dume3BtWy9Bcisw' -H  'Content-Type: application/json' -d '{"msisdn": "+252613300021",  "langid" : "en", "toneType":"default" , "toneid":"04010101010010","tonename":"SONG TITTLE FOR default1" ,"calledparty":"613346923"}'
+
+9)language update
+
+curl -X POST 'http://149.28.148.198:8082/api/langupdate' -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNTI2MTMzNDY5MjEiLCJleHAiOjE2ODg1MDE3NjcsImlhdCI6MTY4ODQ4Mzc2N30.o7716ONvksvAYMfk-ZWCSzpDJnxoo3oYcwegelae4izWQAwYcsaMITbS_E70m9SacuP34L4dume3BtWy9Bcisw' -H  'Content-Type: application/json' -d '{"msisdn": "252613346921",  "langid" : "en" }'
+
+{"msisdn":"252613346921","errorCode":"0","result":"SUCCESS","errorMsg":"","cpid":"CRBT","tid":"MUNI-API-0d02849b-85d6-47f6-b6ce-97d4b744a6da","path":null}
+
+
+10) Get tone playing URL 
+curl -X POST 'http://149.28.148.198:8082/api/gettonepath' -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNTI2MTMzNDY5MjEiLCJleHAiOjE2ODg1MDE3NjcsImlhdCI6MTY4ODQ4Mzc2N30.o7716ONvksvAYMfk-ZWCSzpDJnxoo3oYcwegelae4izWQAwYcsaMITbS_E70m9SacuP34L4dume3BtWy9Bcisw' -H  'Content-Type: application/json' -d '{"msisdn": "+252613346921",  "langid" : "en" ,  "toneid":"04010101010010"}'
+
+
+{"msisdn":"252613346921","errorCode":"1","result":"FAIL","errorMsg":"Exception occurred","cpid":null,"tid":null,"path":null}
+
+11) unsubscribe CRBT API
+ curl -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyNTI2MTMzNDY5MjEiLCJleHAiOjE2ODg1MDE3NjcsImlhdCI6MTY4ODQ4Mzc2N30.o7716ONvksvAYMfk-ZWCSzpDJnxoo3oYcwegelae4izWQAwYcsaMITbS_E70m9SacuP34L4dume3BtWy9Bcisw'  -H 'Content-Type: application/json' -d '{"msisdn": "252613346921",  "langid" : "en", "offer":"CRBT" }' http://149.28.148.198:8082/api/unsubscribe
+
+{"msisdn":"+252613346921","errorCode":"0","result":"SUCCESS","errorMsg":"","cpid":null,"tid":null,"path":null}
+
+
+
+
+
+
+
+
+
+Issues -
+1. unsubscribe CRBT API is pointing to a localhost server instead of actual one.
+2. language update is giving "result": "SUCCESS" but rest of th fields are null.
+3. language update and subscribe CRBT API body section no matter what langid you provide it will give SUCCESS
