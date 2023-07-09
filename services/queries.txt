@@ -4,3 +4,29 @@ password VARCHAR(40)
 );
 
 INSERT INTO users (user, password) VALUES ('hello@gmail.com', '123456789');
+
+
+
+ALTER TABLE users
+ADD crbt BOOLEAN DEFAULT FALSE,
+ADD shuffle BOOLEAN DEFAULT FALSE,
+ADD nametone BOOLEAN DEFAULT FALSE,
+ADD special BOOLEAN DEFAULT FALSE,
+ADD prayer BOOLEAN DEFAULT FALSE,
+ADD gift BOOLEAN DEFAULT FALSE;
+
+
+
+CREATE TABLE aoc_details(
+sl_no INT PRIMARY KEY AUTO_INCREMENT,
+servicetype VARCHAR(20) ,
+message VARCHAR(60),
+price VARCHAR(20)
+);
+
+INSERT INTO aoc_details(servicetype, message, price) VALUES ("crbt", "crbt tone will be cost you 0.02 USD.","0.02 USD."); 
+INSERT INTO aoc_details(servicetype, message, price) VALUES ("shuffle", "shuffle tone will be cost you 0.02 USD.","0.03 USD."); 
+INSERT INTO aoc_details(servicetype, message, price) VALUES ("nametone", "nametone tone will be cost you 0.02 USD.","0.04 USD."); 
+INSERT INTO aoc_details(servicetype, message, price) VALUES ("special", "special tone will be cost you 0.02 USD.","0.05 USD."); 
+INSERT INTO aoc_details(servicetype, message, price) VALUES ("prayer", "prayer tone will be cost you 0.02 USD.","0.06 USD."); 
+INSERT INTO aoc_details(servicetype, message, price) VALUES ("gift", "gift tone will be cost you 0.02 USD.","0.07 USD."); 

@@ -1,12 +1,12 @@
 var jwt = require("jsonwebtoken");
 const db = require("../utils/sqlDatabase");
 
-exports.verify = (req, res, next) => {
-  const token = req.body.token;
-  var decoded = jwt.verify(token, `${process.env.ACCESS_TOKEN}`);
-  console.log(decoded);
-  res.json({ type_of_login: decoded.type_of_user });
-};
+// exports.verify = (req, res, next) => {
+//   const token = req.body.token;
+//   var decoded = jwt.verify(token, `${process.env.ACCESS_TOKEN}`);
+//   console.log(decoded);
+//   res.json({ type_of_login: decoded.type_of_user });
+// };
 
 exports.authenticate = (req, res, next) => {
   var username = req.body.username;
