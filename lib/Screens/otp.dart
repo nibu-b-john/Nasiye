@@ -1,6 +1,8 @@
+import 'dart:convert';
+import 'dart:developer';
+import '../shared_preference.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:http/http.dart' as http;
 
 class OtpScreen extends StatefulWidget {
   const OtpScreen({super.key});
@@ -11,6 +13,7 @@ class OtpScreen extends StatefulWidget {
 
 class _OtpScreenState extends State<OtpScreen> {
   bool fill_num = false;
+  final _form = GlobalKey<FormState>();
   Widget _textField({first, last, size}) {
     return SizedBox(
       height: size.height * 0.0625,
@@ -56,10 +59,26 @@ class _OtpScreenState extends State<OtpScreen> {
     );
   }
 
+  void onsubmit(String username) async {
+    final url = Uri.parse('http://149.28.148.198:8082/security/authenticate');
+    final response = await http.post(url,
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode({"username": username, "password": "2023"}));
+    final decodedResponse = jsonDecode(response.body);
+    if (decodedResponse['token'].length != 0) {
+      await Shared_Preferences.setToken(decodedResponse['token'].toString());
+      Navigator.pushNamed(context, '/subscribe');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     ColorScheme color = Theme.of(context).colorScheme;
     Size size = MediaQuery.of(context).size;
+    final arguments = (ModalRoute.of(context)?.settings.arguments ??
+        <String, dynamic>{}) as Map;
 
     return Scaffold(
         backgroundColor: color.onBackground,
@@ -134,7 +153,7 @@ class _OtpScreenState extends State<OtpScreen> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/subscribe');
+                    onsubmit(arguments['mobNumber']);
                   },
                   style: ElevatedButton.styleFrom(
                       backgroundColor: color.onPrimary),

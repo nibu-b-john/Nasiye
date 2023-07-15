@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:nasiye/Widgets/Help/help_card.dart';
 import 'package:nasiye/Widgets/Help/language_button.dart';
 import 'package:nasiye/Widgets/Help/prayer_button.dart';
 
@@ -32,30 +31,36 @@ class _HelpScreenState extends State<HelpScreen> {
         height: size.height,
         child: Column(
           children: [
-            HelpLanguageButton(),
+            const HelpLanguageButton(),
             const SizedBox(
               height: 0.02,
             ),
             HelpNormalRBTButton(
-                imageUrl: 'assets/place1.jpg',
-                titleText: "Normal RBT",
-                status: 'Unsubscrie'),
+              imageUrl: 'assets/place1.jpg',
+              titleText: "Normal RBT",
+              serviceType: 'crbt',
+            ),
             const SizedBox(
               height: 0.02,
             ),
             HelpNormalRBTButton(
-                imageUrl: 'assets/place2.jpg',
-                titleText: "Prayer RBT",
-                status: 'Unsubscrie'),
+              imageUrl: 'assets/place2.jpg',
+              titleText: "Prayer RBT",
+              serviceType: 'prayer',
+            ),
             const SizedBox(
               height: 0.02,
             ),
-            const HelpCardWidget(
-                imageUrl: 'assets/man.jpg', titleText: "Name Tune", status: ''),
             HelpNormalRBTButton(
-                imageUrl: 'assets/shuffle.png',
-                titleText: "Shuffle",
-                status: 'Unsubscrie'),
+              imageUrl: 'assets/man.jpg',
+              titleText: "Name Tune",
+              serviceType: 'nametone',
+            ),
+            HelpNormalRBTButton(
+              imageUrl: 'assets/shuffle.png',
+              titleText: "Shuffle",
+              serviceType: 'shuffle',
+            ),
           ],
         ),
       ),

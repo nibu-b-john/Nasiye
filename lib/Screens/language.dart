@@ -1,4 +1,8 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+
+import '../shared_preference.dart';
 
 class LanguageScreen extends StatefulWidget {
   const LanguageScreen({super.key});
@@ -103,7 +107,9 @@ class _LanguageScreenState extends State<LanguageScreen> {
                 height: size.height * 0.04375,
               ),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
+                  await Shared_Preferences.setLanguage(
+                      radioValue == 0 ? 'sp' : 'en');
                   Navigator.pushNamed(context, '/mobilenumber');
                 },
                 style:

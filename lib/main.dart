@@ -5,9 +5,12 @@ import 'package:nasiye/Screens/normal_rbt.dart';
 import 'package:nasiye/Screens/otp.dart';
 import 'package:nasiye/Screens/subscribe.dart';
 import 'Screens/language.dart';
+import './shared_preference.dart';
 import 'Screens/mobile_number.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Shared_Preferences.init();
   runApp(const MyApp());
 }
 

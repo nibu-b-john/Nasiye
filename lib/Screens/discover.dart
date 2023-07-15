@@ -1,5 +1,9 @@
+import 'dart:convert';
+import 'dart:developer';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import '../Widgets/Discover/trending_card.dart';
+import '../shared_preference.dart';
 
 class DiscoverScreen extends StatefulWidget {
   bool subscribed;
@@ -38,6 +42,21 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
     });
   }
 
+  Future<String> message(String servicetype) async {
+    final url = Uri.parse('http://149.28.148.198:8082/api/aoc');
+    final getToken = Shared_Preferences.getToken();
+
+    final response = await http.post(url,
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer ${await getToken.then((value) => value)}'
+        },
+        body: jsonEncode({"langid": "en", "servicetype": servicetype}));
+    final decodedResponse = jsonDecode(response.body);
+
+    return decodedResponse['message'];
+  }
+
   @override
   Widget build(BuildContext context) {
     ColorScheme color = Theme.of(context).colorScheme;
@@ -47,28 +66,29 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
         "image": "assets/ringtone.jpg",
         "text": "Normal RBT",
         "route": "/normalRBT",
-        "alert": false
+        "alert": false,
+        'servicetype': ''
       },
       {
         "image": "assets/tajMahal.jpg",
         "text": "Prayer RBT",
         "route": "/nasheed",
         "alert": true,
-        "alertText": "Prayer Tune service will cost 0.01USD,\nDo you accept?"
+        'servicetype': 'prayer'
       },
       {
         "image": "assets/man.jpg",
         "text": "Name Tune",
         "route": "/nasheed",
         "alert": true,
-        "alertText": 'Name Tune service will cost 0.01USD, \nDo you accept?'
+        'servicetype': 'nametone'
       },
       {
         "image": "assets/shuffle.png",
         "text": "Shuffle",
         "route": "/nasheed",
         "alert": true,
-        "alertText": 'Shuffle Tune service will cost 0.01USD,\nDo you accept?'
+        'servicetype': 'shuffle'
       },
     ];
     return Scaffold(
@@ -131,54 +151,64 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                     return GestureDetector(
                       onTap: () {
                         if (categories[index]['alert']) {
-                          showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  actionsAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  actions: [
-                                    ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.red),
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        child: const SizedBox(
-                                          child: Text(
-                                            "Cancel",
-                                            style: TextStyle(
-                                              color: Colors.white,
+                          message(categories[index]['servicetype'])
+                              .then((value) => {
+                                    showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            actionsAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                            actions: [
+                                              ElevatedButton(
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                          backgroundColor:
+                                                              Colors.red),
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: const SizedBox(
+                                                    child: Text(
+                                                      "Cancel",
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  )),
+                                              ElevatedButton(
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                          backgroundColor:
+                                                              color.onPrimary),
+                                                  onPressed: () {
+                                                    Navigator.pushNamed(
+                                                        context,
+                                                        categories[index]
+                                                            ['route']!,
+                                                        arguments: {
+                                                          'appbartitle':
+                                                              categories[index]
+                                                                  ['text']!
+                                                        });
+                                                    // Navigator.pop(context);
+                                                  },
+                                                  child: const SizedBox(
+                                                    child: Text(
+                                                      "Accept",
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  )),
+                                            ],
+                                            content: Text(
+                                              '$value\n\nDo you accept?',
+                                              textAlign: TextAlign.center,
                                             ),
-                                          ),
-                                        )),
-                                    ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                            backgroundColor: color.onPrimary),
-                                        onPressed: () {
-                                          Navigator.pushNamed(context,
-                                              categories[index]['route']!,
-                                              arguments: {
-                                                'appbartitle': categories[index]
-                                                    ['text']!
-                                              });
-                                          // Navigator.pop(context);
-                                        },
-                                        child: const SizedBox(
-                                          child: Text(
-                                            "Accept",
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        )),
-                                  ],
-                                  content: Text(
-                                    categories[index]['alertText'],
-                                    textAlign: TextAlign.center,
-                                  ),
-                                );
-                              });
+                                          );
+                                        })
+                                  });
                         } else {
                           Navigator.pushNamed(
                               context, categories[index]['route']!);

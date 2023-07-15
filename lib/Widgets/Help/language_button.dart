@@ -1,5 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:nasiye/Widgets/Help/help_card.dart';
+import 'package:nasiye/shared_preference.dart';
+import 'dart:developer';
+import 'package:http/http.dart' as http;
 
 class HelpLanguageButton extends StatefulWidget {
   const HelpLanguageButton({super.key});
@@ -9,9 +14,31 @@ class HelpLanguageButton extends StatefulWidget {
 }
 
 class HelpLanguageButtonState extends State<HelpLanguageButton> {
-  String radioValue = 'Somali';
+  String language = '';
+  Future<String> getLanguage() async {
+    String lang = await Shared_Preferences.getLanguage();
+    setState(() {
+      language = lang;
+    });
+    return language;
+  }
+
+  void updateLanguage() async {
+    String token = await Shared_Preferences.getToken();
+
+    final url = Uri.parse('http://149.28.148.198:8082/api/langupdate');
+    final response = await http.post(url,
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token'
+        },
+        body: jsonEncode({"langid": language}));
+    // final decodedResponse = jsonDecode(response.body);
+  }
+
   @override
   Widget build(BuildContext context) {
+    getLanguage();
     ColorScheme color = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: () {
@@ -29,10 +56,14 @@ class HelpLanguageButtonState extends State<HelpLanguageButton> {
                         children: [
                           Radio(
                               activeColor: color.onPrimary,
-                              value: 'Somali',
-                              groupValue: radioValue,
+                              value: 'sp',
+                              groupValue: language,
                               onChanged: (val) {
+                                updateLanguage();
+                                Shared_Preferences.setLanguage(val!);
+                                getLanguage();
                                 Navigator.pop(context);
+
                                 showDialog(
                                     context: context,
                                     builder: (BuildContext context) {
@@ -56,7 +87,7 @@ class HelpLanguageButtonState extends State<HelpLanguageButton> {
                                       );
                                     });
                                 setState(() {
-                                  radioValue = val!;
+                                  language = val;
                                 });
                               }),
                           const Text(
@@ -74,9 +105,13 @@ class HelpLanguageButtonState extends State<HelpLanguageButton> {
                         children: [
                           Radio(
                               activeColor: color.onPrimary,
-                              value: 'English',
-                              groupValue: radioValue,
+                              value: 'en',
+                              groupValue: language,
                               onChanged: (val) {
+                                updateLanguage();
+                                Shared_Preferences.setLanguage(val!);
+                                getLanguage();
+
                                 Navigator.pop(context);
                                 showDialog(
                                     context: context,
@@ -101,7 +136,7 @@ class HelpLanguageButtonState extends State<HelpLanguageButton> {
                                       );
                                     });
                                 setState(() {
-                                  radioValue = val!;
+                                  language = val;
                                 });
                               }),
                           const Text(
@@ -128,7 +163,7 @@ class HelpLanguageButtonState extends State<HelpLanguageButton> {
       },
       child: HelpCardWidget(
           imageUrl: 'assets/band.jpg',
-          titleText: "Language - $radioValue",
+          titleText: "Language - $language",
           status: 'Change'),
     );
   }

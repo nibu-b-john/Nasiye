@@ -1,25 +1,86 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:nasiye/Widgets/Help/help_card.dart';
+import 'package:http/http.dart' as http;
+import '../../shared_preference.dart';
 
 class HelpNormalRBTButton extends StatefulWidget {
   String imageUrl;
   String titleText;
-  String status;
+  String serviceType;
   HelpNormalRBTButton(
       {super.key,
       required this.imageUrl,
       required this.titleText,
-      required this.status});
+      required this.serviceType});
 
   @override
   State<HelpNormalRBTButton> createState() => HelpNormalRBTButtonState();
 }
 
 class HelpNormalRBTButtonState extends State<HelpNormalRBTButton> {
+  String status = '';
+  void subscribe() async {
+    log('Enter subscribe');
+    String token = await Shared_Preferences.getToken();
+    // log(token);
+    final url = Uri.parse('http://149.28.148.198:8082/api/subscribe');
+    final response = await http.post(url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
+        body: jsonEncode({"langid": "en", "offer": widget.serviceType}));
+    final decodedResponse = jsonDecode(response.body);
+    log(decodedResponse.toString());
+    if (decodedResponse['result'] == 'FAIL') {
+      setState(() {
+        status = 'Unsubscribe';
+      });
+    } else {
+      setState(() {
+        status = 'Subscribe';
+      });
+    }
+  }
+
+  void unsubscribe() async {
+    log('Enter unsubscribe');
+    String token = await Shared_Preferences.getToken();
+
+    final url = Uri.parse('http://149.28.148.198:8082/api/unsubscribe');
+    final response = await http.post(url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token'
+        },
+        body: jsonEncode({"langid": "en", "offer": widget.serviceType}));
+    final decodedResponse = jsonDecode(response.body);
+    log(decodedResponse.toString());
+
+    if (decodedResponse['result'] == 'FAIL') {
+      setState(() {
+        status = 'Subscribe';
+      });
+    } else {
+      setState(() {
+        status = 'Unsubscribe';
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    subscribe();
+  }
+
   @override
   Widget build(BuildContext context) {
+    // subscribe();
     ColorScheme color = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: () {
@@ -48,11 +109,11 @@ class HelpNormalRBTButtonState extends State<HelpNormalRBTButton> {
                       style: ElevatedButton.styleFrom(
                           backgroundColor: color.onPrimary),
                       onPressed: () {
-                        setState(() {
-                          widget.status = widget.status == 'Subscribe'
-                              ? 'Unsubscribe'
-                              : 'Subscribe';
-                        });
+                        if (status == 'Subscribe') {
+                          unsubscribe();
+                        } else if (status == 'Unsubscribe') {
+                          subscribe();
+                        }
                         Navigator.pop(context);
                       },
                       child: const SizedBox(
@@ -65,7 +126,7 @@ class HelpNormalRBTButtonState extends State<HelpNormalRBTButton> {
                       )),
                 ],
                 title: Text(
-                  'Are you sure for ${widget.status}\n${widget.titleText}? ',
+                  'Are you sure, you want to ${status == 'Subscribe' ? 'Unsubscribe' : 'Subscribe'}\n${widget.titleText}? ',
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: Colors.black,
@@ -79,7 +140,7 @@ class HelpNormalRBTButtonState extends State<HelpNormalRBTButton> {
       child: HelpCardWidget(
           imageUrl: widget.imageUrl,
           titleText: widget.titleText,
-          status: widget.status),
+          status: status),
     );
   }
 }
